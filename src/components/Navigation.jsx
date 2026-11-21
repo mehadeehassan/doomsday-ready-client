@@ -12,7 +12,7 @@ function Navigation({ activeView, onChangeView }) {
             type="button"
             onClick={() => onChangeView(item)}
             aria-current={isActive ? 'page' : undefined}
-            className={`min-h-10 flex-1 whitespace-nowrap rounded-lg px-4 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400 sm:flex-none ${
+            className={`min-h-10 flex-1 whitespace-nowrap rounded-lg px-2 text-xs font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400 sm:flex-none sm:px-4 sm:text-sm ${
               isActive
                 ? 'bg-slate-800 text-amber-300'
                 : 'text-slate-400 hover:bg-slate-900 hover:text-slate-100'

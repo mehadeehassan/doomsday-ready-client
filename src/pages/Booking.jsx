@@ -1,29 +1,8 @@
 import { useEffect, useState } from 'react'
+import requestApi from '../api.js'
 import BookingForm from '../components/BookingForm.jsx'
 import BookingResult from '../components/BookingResult.jsx'
 import CinemaSelector from '../components/CinemaSelector.jsx'
-
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000').replace(/\/$/, '')
-
-async function requestApi(path) {
-  let response
-
-  try {
-    response = await fetch(`${API_BASE_URL}${path}`)
-  } catch {
-    throw new Error('Backend-এর সাথে যোগাযোগ করা যাচ্ছে না। Backend চালু আছে কি না দেখুন।')
-  }
-
-  const result = await response.json().catch(() => null)
-
-  if (!response.ok || result?.success === false) {
-    const error = new Error(result?.message || `Request failed (${response.status})`)
-    error.status = response.status
-    throw error
-  }
-
-  return result
-}
 
 function Booking() {
   const [cinemas, setCinemas] = useState([])
@@ -96,8 +75,15 @@ function Booking() {
         throw new Error('Backend থেকে booking quote-এর সঠিক format পাওয়া যায়নি।')
       }
 
-      if (result.data.possible && (!result.data.bundles || typeof result.data.bundles !== 'object')) {
-        throw new Error('Backend থেকে bundle breakdown পাওয়া যায়নি।')
+      if (
+        result.data.possible &&
+        (typeof result.data.cinema !== 'string' ||
+          !Number.isInteger(result.data.totalBundles) ||
+          !result.data.bundles ||
+          typeof result.data.bundles !== 'object' ||
+          Array.isArray(result.data.bundles))
+      ) {
+        throw new Error('Backend থেকে booking quote-এর সঠিক format পাওয়া যায়নি।')
       }
 
       setBookingResult(result.data)

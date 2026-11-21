@@ -1,30 +1,8 @@
 import { useEffect, useState } from 'react'
+import requestApi from '../api.js'
 import MovieSelector from '../components/MovieSelector.jsx'
 import RewatchOrderList from '../components/RewatchOrderList.jsx'
 import RewatchProgress from '../components/RewatchProgress.jsx'
-
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000').replace(/\/$/, '')
-
-async function requestApi(path, signal) {
-  let response
-
-  try {
-    response = await fetch(`${API_BASE_URL}${path}`, { signal })
-  } catch (error) {
-    if (error.name === 'AbortError') throw error
-    throw new Error('Backend-এর সাথে যোগাযোগ করা যাচ্ছে না। Backend চালু আছে কি না দেখুন।')
-  }
-
-  const result = await response.json().catch(() => null)
-
-  if (!response.ok || result?.success === false) {
-    const error = new Error(result?.message || `Request failed (${response.status})`)
-    error.status = response.status
-    throw error
-  }
-
-  return result
-}
 
 function RewatchPlan() {
   const [movies, setMovies] = useState([])
@@ -63,7 +41,7 @@ function RewatchPlan() {
 
     const controller = new AbortController()
 
-    requestApi(`/api/movies/${selectedMovieId}/rewatch-order`, controller.signal)
+    requestApi(`/api/movies/${selectedMovieId}/rewatch-order`, { signal: controller.signal })
       .then((result) => {
         const plan = result?.data
         const hasExpectedResponse =

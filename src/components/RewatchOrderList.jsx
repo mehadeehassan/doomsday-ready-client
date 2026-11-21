@@ -33,7 +33,7 @@ function RewatchOrderList({ movies }) {
               </span>
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-start justify-between gap-2">
-                  <h3 className="font-semibold text-slate-100">{movie.title}</h3>
+                  <h3 className="break-words font-semibold text-slate-100">{movie.title}</h3>
                   <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${movie.watched ? 'bg-emerald-900/70 text-emerald-300' : 'bg-slate-800 text-slate-300'}`}>
                     {movie.watched ? '✓ Watched' : 'Unwatched'}
                   </span>

@@ -1,20 +1,5 @@
 import { useEffect, useState } from 'react'
-
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000').replace(/\/$/, '')
-
-async function requestApi(path, options = {}) {
-  const response = await fetch(`${API_BASE_URL}${path}`, options)
-  const result = await response.json().catch(() => null)
-
-  if (!response.ok || result?.success === false) {
-    const error = new Error(result?.message || `Request failed (${response.status})`)
-    error.status = response.status
-    error.code = result?.code
-    throw error
-  }
-
-  return result
-}
+import requestApi from '../api.js'
 
 function getMovieId(movie) {
   return String(movie._id)
@@ -219,7 +204,7 @@ function Movies() {
 
       <section aria-labelledby="add-movie-heading" className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 sm:p-6">
         <h2 id="add-movie-heading" className="text-lg font-semibold">Add Movie</h2>
-        <form onSubmit={handleAddMovie} className="mt-5 space-y-5">
+        <form noValidate onSubmit={handleAddMovie} className="mt-5 space-y-5">
           <div className="grid gap-4 sm:grid-cols-3">
             <label className="space-y-2 text-sm text-slate-300">
               <span>Title</span>
@@ -303,7 +288,7 @@ function Movies() {
                 <article key={movieId} className="rounded-xl border border-slate-800 bg-slate-900/60 p-5">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
-                      <h3 className="text-base font-semibold text-slate-100">{movie.title}</h3>
+                      <h3 className="break-words text-base font-semibold text-slate-100">{movie.title}</h3>
                       <p className="mt-1 text-sm text-slate-400">{movie.releaseYear} · {movie.runtime} min</p>
                     </div>
                     <span className={`rounded-full px-3 py-1 text-xs font-medium ${movie.watched ? 'bg-emerald-950 text-emerald-300' : 'bg-slate-800 text-slate-300'}`}>

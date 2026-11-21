@@ -1,6 +1,6 @@
 function BookingForm({ groupSize, onGroupSizeChange, onSubmit, disabled = false, errorMessage = '' }) {
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form noValidate onSubmit={onSubmit} className="space-y-4">
       <label className="block max-w-xs space-y-2">
         <span className="text-sm font-medium text-slate-300">Group size</span>
         <input
