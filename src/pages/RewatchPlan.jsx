@@ -3,8 +3,10 @@ import requestApi from '../api.js'
 import MovieSelector from '../components/MovieSelector.jsx'
 import RewatchOrderList from '../components/RewatchOrderList.jsx'
 import RewatchProgress from '../components/RewatchProgress.jsx'
+import useToast from '../toast/useToast.js'
 
 function RewatchPlan() {
+  const showToast = useToast()
   const [movies, setMovies] = useState([])
   const [selectedMovieId, setSelectedMovieId] = useState('')
   const [rewatchPlan, setRewatchPlan] = useState(null)
@@ -25,7 +27,11 @@ function RewatchPlan() {
         if (isMounted) setMovies(result.data)
       })
       .catch((error) => {
-        if (isMounted) setMoviesError(error.message || 'Could not load movies.')
+        if (isMounted) {
+          const message = error.message || 'Could not load movies.'
+          setMoviesError(message)
+          showToast('error', `Could not load movies: ${message}`)
+        }
       })
       .finally(() => {
         if (isMounted) setIsMoviesLoading(false)
@@ -34,7 +40,7 @@ function RewatchPlan() {
     return () => {
       isMounted = false
     }
-  }, [])
+  }, [showToast])
 
   useEffect(() => {
     if (!selectedMovieId) return undefined
@@ -58,7 +64,9 @@ function RewatchPlan() {
       })
       .catch((error) => {
         if (error.name !== 'AbortError') {
-          setPlanError(error.message || 'Could not load the rewatch plan.')
+          const message = error.message || 'Could not load the rewatch plan.'
+          setPlanError(message)
+          showToast('error', `Rewatch plan failed to load: ${message}`)
         }
       })
       .finally(() => {
@@ -66,7 +74,7 @@ function RewatchPlan() {
       })
 
     return () => controller.abort()
-  }, [selectedMovieId])
+  }, [selectedMovieId, showToast])
 
   function handleMovieSelect(movieId) {
     setSelectedMovieId(movieId)
@@ -85,7 +93,7 @@ function RewatchPlan() {
         </p>
       </div>
 
-      <section className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 sm:p-6">
+      <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-lg shadow-black/10 sm:p-6">
         {isMoviesLoading ? (
           <p role="status" className="text-sm text-slate-400">Loading movies…</p>
         ) : moviesError ? (

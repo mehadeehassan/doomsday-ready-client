@@ -1,22 +1,37 @@
 function RewatchProgress({ watchedCount, totalMovies, remainingRuntime }) {
+  const progressPercent = totalMovies === 0 ? 0 : (watchedCount / totalMovies) * 100
+
   return (
-    <section aria-labelledby="rewatch-progress-heading" className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 sm:p-6">
-      <h2 id="rewatch-progress-heading" className="text-base font-semibold">Plan progress</h2>
-      <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="text-xl font-semibold text-slate-100">
+    <section aria-labelledby="rewatch-progress-heading" className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-lg shadow-black/10 sm:p-6">
+      <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-300">Your progress</p>
+          <h2 id="rewatch-progress-heading" className="mt-2 text-xl font-semibold text-slate-100">
             {watchedCount} of {totalMovies} watched
-          </p>
-          <progress
-            className="mt-3 h-2 w-full accent-amber-400 sm:w-72"
-            value={watchedCount}
-            max={totalMovies || 1}
-            aria-label={`${watchedCount} of ${totalMovies} movies watched`}
-          />
+          </h2>
+          <div
+            role="progressbar"
+            aria-label="Rewatch plan progress"
+            aria-valuemin={0}
+            aria-valuemax={totalMovies || 1}
+            aria-valuenow={watchedCount}
+            className="mt-4 h-2.5 overflow-hidden rounded-full bg-slate-800"
+          >
+            <div
+              className="h-full rounded-full bg-amber-400 transition-[width] duration-300"
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
         </div>
-        <div className="rounded-lg bg-slate-950 px-4 py-3 sm:min-w-44">
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Remaining runtime</p>
-          <p className="mt-1 text-lg font-semibold text-amber-300">{remainingRuntime} min</p>
+
+        <div className="flex shrink-0 items-center gap-3 rounded-xl border border-slate-800 bg-slate-950/80 px-4 py-3 sm:min-w-48">
+          <span className="flex size-10 items-center justify-center rounded-lg bg-amber-400/10 text-lg text-amber-300" aria-hidden="true">
+            ◷
+          </span>
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Remaining runtime</p>
+            <p className="mt-0.5 text-lg font-semibold text-slate-100">{remainingRuntime} min</p>
+          </div>
         </div>
       </div>
     </section>

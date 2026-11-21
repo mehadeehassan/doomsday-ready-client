@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import requestApi from '../api.js'
+import useToast from '../toast/useToast.js'
 
 function getMovieId(movie) {
   return String(movie._id)
@@ -38,11 +39,11 @@ function MoviePrerequisites({ movies, selectedIds, onChange, disabled = false })
 }
 
 function Movies() {
+  const showToast = useToast()
   const [movies, setMovies] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
-  const [successMessage, setSuccessMessage] = useState('')
   const [formError, setFormError] = useState('')
   const [title, setTitle] = useState('')
   const [releaseYear, setReleaseYear] = useState('')
@@ -88,7 +89,6 @@ function Movies() {
     event.preventDefault()
     setFormError('')
     setErrorMessage('')
-    setSuccessMessage('')
 
     const parsedReleaseYear = Number(releaseYear)
     const parsedRuntime = Number(runtime)
@@ -125,9 +125,15 @@ function Movies() {
       setReleaseYear('')
       setRuntime('')
       setNewPrerequisiteIds([])
-      setSuccessMessage('Movie added successfully.')
+      showToast('success', 'Movie created successfully.')
     } catch (error) {
-      setFormError(error.message || 'Could not add the movie.')
+      if (error.status === 409 && error.message.toLowerCase().includes('title already exists')) {
+        showToast('error', 'A movie with this title already exists.')
+      } else if (error.code === 'CIRCULAR_DEPENDENCY') {
+        showToast('error', `Circular dependency: ${error.message}`)
+      } else {
+        showToast('error', `Movie creation failed: ${error.message || 'Please try again.'}`)
+      }
     } finally {
       setIsSaving(false)
     }
@@ -135,7 +141,6 @@ function Movies() {
 
   async function handleWatchedChange(movie) {
     setErrorMessage('')
-    setSuccessMessage('')
     setIsSaving(true)
 
     try {
@@ -146,9 +151,9 @@ function Movies() {
       })
 
       await refreshMovies()
-      setSuccessMessage(`Watched status updated for “${movie.title}”.`)
+      showToast('success', `Watched status updated for “${movie.title}”.`)
     } catch (error) {
-      setErrorMessage(error.message || 'Could not update the watched status.')
+      showToast('error', `Could not update the watched status: ${error.message || 'Please try again.'}`)
     } finally {
       setIsSaving(false)
     }
@@ -158,12 +163,10 @@ function Movies() {
     setEditingMovieId(getMovieId(movie))
     setEditedPrerequisiteIds((movie.prerequisites || []).map(String))
     setErrorMessage('')
-    setSuccessMessage('')
   }
 
   async function handlePrerequisiteSave(movie) {
     setErrorMessage('')
-    setSuccessMessage('')
     setIsSaving(true)
 
     try {
@@ -175,9 +178,13 @@ function Movies() {
 
       await refreshMovies()
       setEditingMovieId('')
-      setSuccessMessage(`Prerequisites updated for “${movie.title}”.`)
+      showToast('success', `Movie updated successfully: prerequisites for “${movie.title}”.`)
     } catch (error) {
-      setErrorMessage(error.message || 'Could not update prerequisites.')
+      if (error.code === 'CIRCULAR_DEPENDENCY') {
+        showToast('error', `Circular dependency: ${error.message}`)
+      } else {
+        showToast('error', `Could not update prerequisites: ${error.message || 'Please try again.'}`)
+      }
     } finally {
       setIsSaving(false)
     }
@@ -196,14 +203,11 @@ function Movies() {
           {errorMessage}
         </div>
       )}
-      {successMessage && (
-        <div role="status" className="rounded-lg border border-emerald-900 bg-emerald-950/50 px-4 py-3 text-sm text-emerald-200">
-          {successMessage}
+      <section aria-labelledby="add-movie-heading" className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-lg shadow-black/10 sm:p-6">
+        <div className="mb-5">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-300">Movie library</p>
+          <h2 id="add-movie-heading" className="mt-1 text-lg font-semibold">Add Movie</h2>
         </div>
-      )}
-
-      <section aria-labelledby="add-movie-heading" className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 sm:p-6">
-        <h2 id="add-movie-heading" className="text-lg font-semibold">Add Movie</h2>
         <form noValidate onSubmit={handleAddMovie} className="mt-5 space-y-5">
           <div className="grid gap-4 sm:grid-cols-3">
             <label className="block space-y-2 text-sm font-medium text-slate-300">
@@ -214,7 +218,7 @@ function Movies() {
                 maxLength={120}
                 required
                 placeholder="Enter movie title"
-                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 placeholder:text-slate-400 outline-none focus:border-amber-400"
+                className="min-h-11 w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 placeholder:text-slate-400 outline-none transition-colors focus:border-amber-400 focus:ring-2 focus:ring-amber-400/15"
               />
             </label>
             <label className="block space-y-2 text-sm font-medium text-slate-300">
@@ -227,7 +231,7 @@ function Movies() {
                 onChange={(event) => setReleaseYear(event.target.value)}
                 required
                 placeholder="e.g. 2018"
-                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 placeholder:text-slate-400 outline-none focus:border-amber-400"
+                className="min-h-11 w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 placeholder:text-slate-400 outline-none transition-colors focus:border-amber-400 focus:ring-2 focus:ring-amber-400/15"
               />
             </label>
             <label className="block space-y-2 text-sm font-medium text-slate-300">
@@ -241,7 +245,7 @@ function Movies() {
                 onChange={(event) => setRuntime(event.target.value)}
                 required
                 placeholder="e.g. 149"
-                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 placeholder:text-slate-400 outline-none focus:border-amber-400"
+                className="min-h-11 w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 placeholder:text-slate-400 outline-none transition-colors focus:border-amber-400 focus:ring-2 focus:ring-amber-400/15"
               />
             </label>
           </div>
@@ -261,7 +265,7 @@ function Movies() {
           <button
             type="submit"
             disabled={isSaving}
-            className="min-h-10 rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-60"
+            className="min-h-11 rounded-xl bg-amber-400 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow-sm shadow-amber-950/20 transition-colors hover:bg-amber-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-300 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSaving ? 'Saving…' : 'Add Movie'}
           </button>
@@ -288,18 +292,22 @@ function Movies() {
               const isEditing = editingMovieId === movieId
 
               return (
-                <article key={movieId} className="rounded-xl border border-slate-800 bg-slate-900/60 p-5">
+                <article key={movieId} className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-lg shadow-black/10 transition-colors hover:border-slate-700 sm:p-6">
                   <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div>
-                      <h3 className="break-words text-base font-semibold text-slate-100">{movie.title}</h3>
-                      <p className="mt-1 text-sm text-slate-400">{movie.releaseYear} · {movie.runtime} min</p>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="wrap-break-word text-lg font-semibold leading-6 text-slate-100">{movie.title}</h3>
+                      <div className="mt-3 flex flex-wrap gap-2 text-xs font-medium text-slate-300">
+                        <span className="rounded-lg border border-slate-800 bg-slate-950/70 px-2.5 py-1.5">{movie.releaseYear}</span>
+                        <span className="rounded-lg border border-slate-800 bg-slate-950/70 px-2.5 py-1.5">{movie.runtime} min</span>
+                      </div>
                     </div>
-                    <span className={`rounded-full px-3 py-1 text-xs font-medium ${movie.watched ? 'bg-emerald-950 text-emerald-300' : 'bg-slate-800 text-slate-300'}`}>
+                    <span className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold ring-1 ${movie.watched ? 'bg-emerald-950/70 text-emerald-300 ring-emerald-900' : 'bg-slate-800/80 text-slate-300 ring-slate-700'}`}>
+                      {movie.watched && <span aria-hidden="true">✓</span>}
                       {movie.watched ? 'Watched' : 'Unwatched'}
                     </span>
                   </div>
 
-                  <div className="mt-4 border-t border-slate-800 pt-4">
+                  <div className="mt-5 border-t border-slate-800 pt-4">
                     {isEditing ? (
                       <div className="space-y-4">
                         <fieldset className="space-y-3">
@@ -312,21 +320,29 @@ function Movies() {
                           />
                         </fieldset>
                         <div className="flex flex-wrap gap-2">
-                          <button type="button" onClick={() => handlePrerequisiteSave(movie)} disabled={isSaving} className="rounded-lg bg-amber-400 px-3 py-2 text-sm font-semibold text-slate-950 disabled:opacity-60">Save prerequisites</button>
-                          <button type="button" onClick={() => setEditingMovieId('')} disabled={isSaving} className="rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-300 disabled:opacity-60">Cancel</button>
+                          <button type="button" onClick={() => handlePrerequisiteSave(movie)} disabled={isSaving} className="min-h-10 rounded-xl bg-amber-400 px-4 py-2 text-sm font-semibold text-slate-950 transition-colors hover:bg-amber-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-300 disabled:cursor-not-allowed disabled:opacity-60">Save prerequisites</button>
+                          <button type="button" onClick={() => setEditingMovieId('')} disabled={isSaving} className="min-h-10 rounded-xl border border-slate-700 px-4 py-2 text-sm font-medium text-slate-300 transition-colors hover:border-slate-500 hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400 disabled:cursor-not-allowed disabled:opacity-60">Cancel</button>
                         </div>
                       </div>
                     ) : (
                       <>
-                        <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Prerequisites</p>
-                        <p className="mt-1 text-sm text-slate-300">
-                          {prerequisiteMovies.length > 0
-                            ? prerequisiteMovies.map((prerequisite) => prerequisite.title).join(', ')
-                            : 'None'}
-                        </p>
+                        <div className="rounded-xl border border-slate-800 bg-slate-950/50 p-4">
+                          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Prerequisites</p>
+                          {prerequisiteMovies.length > 0 ? (
+                            <ul className="mt-3 flex flex-wrap gap-2">
+                              {prerequisiteMovies.map((prerequisite) => (
+                                <li key={getMovieId(prerequisite)} className="max-w-full rounded-lg bg-slate-800/80 px-3 py-1.5 text-sm text-slate-200">
+                                  {prerequisite.title}
+                                </li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <p className="mt-2 text-sm text-slate-400">No prerequisites</p>
+                          )}
+                        </div>
                         <div className="mt-4 flex flex-wrap gap-2">
-                          <button type="button" onClick={() => startEditingPrerequisites(movie)} disabled={isSaving} className="rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-300 hover:border-slate-500 disabled:opacity-60">Edit prerequisites</button>
-                          <button type="button" onClick={() => handleWatchedChange(movie)} disabled={isSaving} className="rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-300 hover:border-slate-500 disabled:opacity-60">
+                          <button type="button" onClick={() => startEditingPrerequisites(movie)} disabled={isSaving} className="min-h-10 rounded-xl border border-slate-700 px-4 py-2 text-sm font-medium text-slate-300 transition-colors hover:border-slate-500 hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400 disabled:cursor-not-allowed disabled:opacity-60">Edit prerequisites</button>
+                          <button type="button" onClick={() => handleWatchedChange(movie)} disabled={isSaving} className="min-h-10 rounded-xl bg-amber-400 px-4 py-2 text-sm font-semibold text-slate-950 transition-colors hover:bg-amber-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-300 disabled:cursor-not-allowed disabled:opacity-60">
                             Mark {movie.watched ? 'unwatched' : 'watched'}
                           </button>
                         </div>
