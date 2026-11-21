@@ -1,121 +1,64 @@
 import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+
+const navigationItems = ['Movies', 'Rewatch Plan', 'Booking']
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [activeView, setActiveView] = useState('Movies')
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <div className="min-h-screen bg-slate-950 text-slate-100">
+      <header className="border-b border-slate-800 bg-slate-950">
+        <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+          <a href="#main-content" className="flex items-center gap-3 self-start rounded focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber-400">
+            <span className="flex size-10 items-center justify-center rounded-lg bg-amber-400 font-bold text-slate-950" aria-hidden="true">
+              DR
+            </span>
+            <span className="text-lg font-semibold tracking-tight">Doomsday Ready</span>
+          </a>
+
+          <nav aria-label="Main navigation" className="flex w-full gap-2 overflow-x-auto sm:w-auto">
+            {navigationItems.map((item) => {
+              const isActive = activeView === item
+
+              return (
+                <button
+                  key={item}
+                  type="button"
+                  onClick={() => setActiveView(item)}
+                  aria-current={isActive ? 'page' : undefined}
+                  className={`min-h-10 flex-1 whitespace-nowrap rounded-lg px-4 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400 sm:flex-none ${
+                    isActive
+                      ? 'bg-slate-800 text-amber-300'
+                      : 'text-slate-400 hover:bg-slate-900 hover:text-slate-100'
+                  }`}
+                >
+                  {item}
+                </button>
+              )
+            })}
+          </nav>
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
+      </header>
+
+      <main id="main-content" className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
+        <div className="mb-6">
+          <p className="mb-2 text-sm font-medium text-amber-300">Doomsday Ready</p>
+          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{activeView}</h1>
         </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
+
+        <section
+          aria-labelledby="view-placeholder-title"
+          className="min-h-52 rounded-xl border border-slate-800 bg-slate-900/60 p-6 sm:p-8"
         >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+          <h2 id="view-placeholder-title" className="text-lg font-medium text-slate-100">
+            {activeView}
+          </h2>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
+            এই view-এর content পরবর্তী ধাপে যোগ করা হবে।
+          </p>
+        </section>
+      </main>
+    </div>
   )
 }
 
