@@ -2,7 +2,7 @@ function BookingForm({ groupSize, onGroupSizeChange, onSubmit, disabled = false,
   return (
     <form noValidate onSubmit={onSubmit} className="space-y-4">
       <label className="block max-w-xs space-y-2">
-        <span className="text-sm font-medium text-slate-300">Group size</span>
+        <span className="block text-sm font-medium text-slate-300">Group Size</span>
         <input
           type="number"
           min="1"
@@ -15,7 +15,7 @@ function BookingForm({ groupSize, onGroupSizeChange, onSubmit, disabled = false,
           disabled={disabled}
           className="min-h-11 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-slate-100 outline-none focus:border-amber-400 disabled:cursor-not-allowed disabled:opacity-60"
         />
-        <span className="block text-xs text-slate-500">১ থেকে ১০,০০০ জন</span>
+        <span className="block text-xs text-slate-500">Enter a whole number from 1 to 10,000.</span>
       </label>
 
       {errorMessage && <p role="alert" className="text-sm text-red-300">{errorMessage}</p>}

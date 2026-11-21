@@ -7,7 +7,7 @@ async function requestApi(path, options = {}) {
     response = await fetch(`${API_BASE_URL}${path}`, options)
   } catch (error) {
     if (error.name === 'AbortError') throw error
-    throw new Error('Backend-এর সাথে যোগাযোগ করা যাচ্ছে না। Backend চালু আছে কি না দেখুন।')
+    throw new Error('Unable to connect to the backend. Check that the server is running.')
   }
 
   const result = await response.json().catch(() => null)

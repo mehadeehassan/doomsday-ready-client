@@ -20,13 +20,13 @@ function Booking() {
     requestApi('/api/cinemas')
       .then((result) => {
         if (!Array.isArray(result?.data)) {
-          throw new Error('Backend থেকে cinema list-এর সঠিক format পাওয়া যায়নি।')
+          throw new Error('The backend returned an invalid cinema list.')
         }
 
         if (isMounted) setCinemas(result.data)
       })
       .catch((error) => {
-        if (isMounted) setCinemasError(error.message || 'Cinema list load করা যায়নি।')
+        if (isMounted) setCinemasError(error.message || 'Could not load cinemas.')
       })
       .finally(() => {
         if (isMounted) setIsCinemasLoading(false)
@@ -55,13 +55,13 @@ function Booking() {
     setBookingResult(null)
 
     if (!selectedCinemaId) {
-      setFormError('একটি cinema নির্বাচন করুন।')
+      setFormError('Select a cinema.')
       return
     }
 
     const parsedGroupSize = Number(groupSize)
     if (!Number.isInteger(parsedGroupSize) || parsedGroupSize < 1 || parsedGroupSize > 10000) {
-      setFormError('Group size 1 থেকে 10,000-এর মধ্যে পূর্ণসংখ্যা হতে হবে।')
+      setFormError('Group size must be a whole number between 1 and 10,000.')
       return
     }
 
@@ -72,7 +72,7 @@ function Booking() {
       const result = await requestApi(`/api/cinemas/${selectedCinemaId}/booking?${query}`)
 
       if (typeof result?.data?.possible !== 'boolean') {
-        throw new Error('Backend থেকে booking quote-এর সঠিক format পাওয়া যায়নি।')
+        throw new Error('The backend returned an invalid booking quote.')
       }
 
       if (
@@ -83,12 +83,12 @@ function Booking() {
           typeof result.data.bundles !== 'object' ||
           Array.isArray(result.data.bundles))
       ) {
-        throw new Error('Backend থেকে booking quote-এর সঠিক format পাওয়া যায়নি।')
+        throw new Error('The backend returned an invalid booking quote.')
       }
 
       setBookingResult(result.data)
     } catch (error) {
-      setFormError(error.message || 'Booking quote পাওয়া যায়নি।')
+      setFormError(error.message || 'Could not get a booking quote.')
     } finally {
       setIsQuoteLoading(false)
     }
@@ -100,13 +100,13 @@ function Booking() {
         <p className="mb-2 text-sm font-medium text-amber-300">Doomsday Ready</p>
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Cinema Booking</h1>
         <p className="mt-2 text-sm text-slate-400">
-          Cinema ও group size বেছে backend থেকে booking quote নিন।
+          Select a cinema and group size to get a booking quote.
         </p>
       </div>
 
       {isCinemasLoading ? (
         <p role="status" className="rounded-xl border border-slate-800 bg-slate-900/60 p-6 text-sm text-slate-400">
-          Cinemas load হচ্ছে…
+          Loading cinemas…
         </p>
       ) : cinemasError ? (
         <div role="alert" className="rounded-lg border border-red-900 bg-red-950/60 px-4 py-3 text-sm text-red-200">
@@ -116,7 +116,7 @@ function Booking() {
         <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-6 sm:p-8">
           <h2 className="text-lg font-semibold">No cinemas available</h2>
           <p className="mt-2 text-sm leading-6 text-slate-400">
-            Booking quote পেতে backend-এ অন্তত একটি cinema যোগ করতে হবে।
+            Add at least one cinema to the backend before requesting a booking quote.
           </p>
         </div>
       ) : (
@@ -142,7 +142,7 @@ function Booking() {
 
           {isQuoteLoading && (
             <p role="status" className="rounded-xl border border-slate-800 bg-slate-900/60 p-6 text-sm text-slate-400">
-              Booking quote load হচ্ছে…
+              Loading booking quote…
             </p>
           )}
           {!isQuoteLoading && <BookingResult result={bookingResult} />}

@@ -19,13 +19,13 @@ function RewatchPlan() {
     requestApi('/api/movies')
       .then((result) => {
         if (!Array.isArray(result?.data)) {
-          throw new Error('Backend থেকে movie list-এর সঠিক format পাওয়া যায়নি।')
+          throw new Error('The backend returned an invalid movie list.')
         }
 
         if (isMounted) setMovies(result.data)
       })
       .catch((error) => {
-        if (isMounted) setMoviesError(error.message || 'Movies load করা যায়নি।')
+        if (isMounted) setMoviesError(error.message || 'Could not load movies.')
       })
       .finally(() => {
         if (isMounted) setIsMoviesLoading(false)
@@ -51,14 +51,14 @@ function RewatchPlan() {
           Number.isFinite(plan.remainingRuntime)
 
         if (!hasExpectedResponse) {
-          throw new Error('Backend থেকে rewatch plan-এর সঠিক format পাওয়া যায়নি।')
+          throw new Error('The backend returned an invalid rewatch plan.')
         }
 
         setRewatchPlan(plan)
       })
       .catch((error) => {
         if (error.name !== 'AbortError') {
-          setPlanError(error.message || 'Rewatch plan load করা যায়নি।')
+          setPlanError(error.message || 'Could not load the rewatch plan.')
         }
       })
       .finally(() => {
@@ -81,17 +81,17 @@ function RewatchPlan() {
         <p className="mb-2 text-sm font-medium text-amber-300">Doomsday Ready</p>
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Rewatch Plan</h1>
         <p className="mt-2 text-sm text-slate-400">
-          Movie বেছে backend-এর নির্ধারিত prerequisite order দেখুন।
+          Choose a movie to view the prerequisite order returned by the backend.
         </p>
       </div>
 
       <section className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 sm:p-6">
         {isMoviesLoading ? (
-          <p role="status" className="text-sm text-slate-400">Movies load হচ্ছে…</p>
+          <p role="status" className="text-sm text-slate-400">Loading movies…</p>
         ) : moviesError ? (
           <div role="alert" className="text-sm text-red-300">{moviesError}</div>
         ) : movies.length === 0 ? (
-          <p className="text-sm text-slate-400">Rewatch plan তৈরি করতে আগে একটি movie যোগ করুন।</p>
+          <p className="text-sm text-slate-400">Add a movie before creating a rewatch plan.</p>
         ) : (
           <MovieSelector
             movies={movies}
@@ -110,7 +110,7 @@ function RewatchPlan() {
 
       {isPlanLoading && (
         <p role="status" className="rounded-xl border border-slate-800 bg-slate-900/60 p-6 text-sm text-slate-400">
-          Rewatch plan load হচ্ছে…
+          Loading rewatch plan…
         </p>
       )}
 

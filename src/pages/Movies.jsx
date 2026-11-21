@@ -7,7 +7,7 @@ function getMovieId(movie) {
 
 function MoviePrerequisites({ movies, selectedIds, onChange, disabled = false }) {
   if (movies.length === 0) {
-    return <p className="text-sm text-slate-500">Prerequisite হিসেবে যোগ করার মতো অন্য কোনো movie নেই।</p>
+    return <p className="text-sm text-slate-500">There are no other movies to add as prerequisites.</p>
   }
 
   return (
@@ -57,13 +57,13 @@ function Movies() {
     requestApi('/api/movies')
       .then((result) => {
         if (!Array.isArray(result?.data)) {
-          throw new Error('Backend থেকে movie list-এর সঠিক format পাওয়া যায়নি।')
+          throw new Error('The backend returned an invalid movie list.')
         }
 
         if (isMounted) setMovies(result.data)
       })
       .catch((error) => {
-        if (isMounted) setErrorMessage(error.message || 'Movies load করা যায়নি।')
+        if (isMounted) setErrorMessage(error.message || 'Could not load movies.')
       })
       .finally(() => {
         if (isMounted) setIsLoading(false)
@@ -78,7 +78,7 @@ function Movies() {
     const result = await requestApi('/api/movies')
 
     if (!Array.isArray(result?.data)) {
-      throw new Error('Backend থেকে movie list-এর সঠিক format পাওয়া যায়নি।')
+      throw new Error('The backend returned an invalid movie list.')
     }
 
     setMovies(result.data)
@@ -94,15 +94,15 @@ function Movies() {
     const parsedRuntime = Number(runtime)
 
     if (!title.trim()) {
-      setFormError('Movie title লিখুন।')
+      setFormError('Enter a movie title.')
       return
     }
     if (!Number.isInteger(parsedReleaseYear) || parsedReleaseYear < 1) {
-      setFormError('সঠিক release year লিখুন।')
+      setFormError('Enter a valid release year.')
       return
     }
     if (!Number.isInteger(parsedRuntime) || parsedRuntime < 1 || parsedRuntime > 300) {
-      setFormError('Runtime 1 থেকে 300 মিনিটের মধ্যে লিখুন।')
+      setFormError('Runtime must be between 1 and 300 minutes.')
       return
     }
 
@@ -125,9 +125,9 @@ function Movies() {
       setReleaseYear('')
       setRuntime('')
       setNewPrerequisiteIds([])
-      setSuccessMessage('Movie সফলভাবে যোগ হয়েছে।')
+      setSuccessMessage('Movie added successfully.')
     } catch (error) {
-      setFormError(error.message || 'Movie যোগ করা যায়নি।')
+      setFormError(error.message || 'Could not add the movie.')
     } finally {
       setIsSaving(false)
     }
@@ -146,9 +146,9 @@ function Movies() {
       })
 
       await refreshMovies()
-      setSuccessMessage(`“${movie.title}”-এর watched status update হয়েছে।`)
+      setSuccessMessage(`Watched status updated for “${movie.title}”.`)
     } catch (error) {
-      setErrorMessage(error.message || 'Watched status update করা যায়নি।')
+      setErrorMessage(error.message || 'Could not update the watched status.')
     } finally {
       setIsSaving(false)
     }
@@ -175,9 +175,9 @@ function Movies() {
 
       await refreshMovies()
       setEditingMovieId('')
-      setSuccessMessage(`“${movie.title}”-এর prerequisites update হয়েছে।`)
+      setSuccessMessage(`Prerequisites updated for “${movie.title}”.`)
     } catch (error) {
-      setErrorMessage(error.message || 'Prerequisites update করা যায়নি।')
+      setErrorMessage(error.message || 'Could not update prerequisites.')
     } finally {
       setIsSaving(false)
     }
@@ -188,7 +188,7 @@ function Movies() {
       <div>
         <p className="mb-2 text-sm font-medium text-amber-300">Doomsday Ready</p>
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Movies</h1>
-        <p className="mt-2 text-sm text-slate-400">Movie list এবং watched status পরিচালনা করুন।</p>
+        <p className="mt-2 text-sm text-slate-400">Manage your movie list and watched status.</p>
       </div>
 
       {errorMessage && (
@@ -206,18 +206,19 @@ function Movies() {
         <h2 id="add-movie-heading" className="text-lg font-semibold">Add Movie</h2>
         <form noValidate onSubmit={handleAddMovie} className="mt-5 space-y-5">
           <div className="grid gap-4 sm:grid-cols-3">
-            <label className="space-y-2 text-sm text-slate-300">
-              <span>Title</span>
+            <label className="block space-y-2 text-sm font-medium text-slate-300">
+              <span className="block">Title</span>
               <input
                 value={title}
                 onChange={(event) => setTitle(event.target.value)}
                 maxLength={120}
                 required
-                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 outline-none focus:border-amber-400"
+                placeholder="Enter movie title"
+                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 placeholder:text-slate-400 outline-none focus:border-amber-400"
               />
             </label>
-            <label className="space-y-2 text-sm text-slate-300">
-              <span>Release year</span>
+            <label className="block space-y-2 text-sm font-medium text-slate-300">
+              <span className="block">Release Year</span>
               <input
                 type="number"
                 min="1"
@@ -225,11 +226,12 @@ function Movies() {
                 value={releaseYear}
                 onChange={(event) => setReleaseYear(event.target.value)}
                 required
-                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 outline-none focus:border-amber-400"
+                placeholder="e.g. 2018"
+                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 placeholder:text-slate-400 outline-none focus:border-amber-400"
               />
             </label>
-            <label className="space-y-2 text-sm text-slate-300">
-              <span>Runtime (minutes)</span>
+            <label className="block space-y-2 text-sm font-medium text-slate-300">
+              <span className="block">Runtime (Minutes)</span>
               <input
                 type="number"
                 min="1"
@@ -238,13 +240,14 @@ function Movies() {
                 value={runtime}
                 onChange={(event) => setRuntime(event.target.value)}
                 required
-                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 outline-none focus:border-amber-400"
+                placeholder="e.g. 149"
+                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 placeholder:text-slate-400 outline-none focus:border-amber-400"
               />
             </label>
           </div>
 
           <fieldset className="space-y-3">
-            <legend className="text-sm font-medium text-slate-300">Prerequisite movies (optional)</legend>
+            <legend className="text-sm font-medium text-slate-300">Prerequisite Movies (Optional)</legend>
             <MoviePrerequisites
               movies={movies}
               selectedIds={newPrerequisiteIds}
@@ -272,9 +275,9 @@ function Movies() {
         </div>
 
         {isLoading ? (
-          <p role="status" className="rounded-xl border border-slate-800 bg-slate-900/60 p-6 text-sm text-slate-400">Movies load হচ্ছে…</p>
+          <p role="status" className="rounded-xl border border-slate-800 bg-slate-900/60 p-6 text-sm text-slate-400">Loading movies…</p>
         ) : movies.length === 0 ? (
-          <p className="rounded-xl border border-slate-800 bg-slate-900/60 p-6 text-sm text-slate-400">এখনো কোনো movie যোগ করা হয়নি।</p>
+          <p className="rounded-xl border border-slate-800 bg-slate-900/60 p-6 text-sm text-slate-400">No movies have been added yet.</p>
         ) : (
           <div className="grid gap-4 lg:grid-cols-2">
             {movies.map((movie) => {

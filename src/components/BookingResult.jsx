@@ -6,7 +6,7 @@ function BookingResult({ result }) {
       <section role="status" aria-labelledby="booking-result-heading" className="rounded-xl border border-amber-900/70 bg-amber-950/20 p-5 sm:p-6">
         <h2 id="booking-result-heading" className="text-lg font-semibold">Not Possible</h2>
         <p className="mt-2 text-sm leading-6 text-amber-100/80">
-          {result.message || 'এই group size-এর জন্য exact bundle combination পাওয়া যায়নি।'}
+          {result.message || 'No exact bundle combination is available for this group size.'}
         </p>
       </section>
     )
